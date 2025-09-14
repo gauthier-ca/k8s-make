@@ -1,0 +1,10 @@
+# Test recipes are application specific. Below is an example that
+# runs npm test inside an application pod and fetches test snapshots.
+
+# test::
+# 	$(eval pod := $(shell $(kubectl) get pod -l app=$(app) -n ${namespace} | grep Running | head -1 | cut -d' ' -f1))
+# 	$(kubectl) exec -it $(pod) -n ${namespace} -- npm test
+
+# snapshot:
+# 	$(eval pod := $(shell $(kubectl) get pod -l app=$(app) -n ${namespace} | grep Running | head -1 | cut -d' ' -f1))
+# 	$(kubectl) cp $(pod):__tests__/__snapshots__/e2e.js.snap src/__tests__/__snapshots__/e2e.js.snap -n ${namespace}

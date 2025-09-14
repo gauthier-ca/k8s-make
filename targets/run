@@ -1,0 +1,14 @@
+# Get the app name from the Service nanme in the manifest, use grep to avoid a dependency on yq
+app = $(shell ${kustomize} | grep -E 'kind: (Deployment|Job)' -A 10 | grep 'name:' | head -1 | awk '{ print $$2 }')
+namespace = $(shell ${kustomize} | grep -E 'kind: (Deployment|Job)' -A 10 | grep 'namespace:' | head -1 | awk '{ print $$2 }')
+
+config::
+	@echo app = ${app}
+	@echo namespace = ${namespace}
+
+deploy::
+	@${kustomize} | ${kubectl} apply -f -
+	@#${kubectl} rollout status deployment.apps/${app} -n ${namespace}
+	kubectl wait --for=condition=Ready pod -l app=${app} -n ${namespace}
+
+run:: deploy test

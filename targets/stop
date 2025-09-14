@@ -1,0 +1,3 @@
+stop::
+	@${kustomize} | ${kubectl} delete --selector delete!=persist -f - --ignore-not-found
+

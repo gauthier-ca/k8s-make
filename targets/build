@@ -1,0 +1,22 @@
+# Get the app name from the manifest, use grep to avoid a dependency on yq
+image = $(shell ${kustomize} | grep -E 'kind: (Deployment|Job)' -A 50 | grep 'containers:' -A 50 | grep 'image:'| head -1 | awk '{ print $$2 }')
+
+build::
+	@#docker build -t ${image} . --progress=plain --no-cache
+	docker build -t ${image} .
+
+clean:: stop
+	@docker rmi -f "${image}" &> /dev/null
+
+config::
+	@echo image = ${image}
+
+login::
+	aws ecr get-login-password | docker login --username AWS --password-stdin ${REGISTRY_BASE}
+
+push::
+	docker push ${image}
+
+repo::
+	aws ecr create-repository --repository-name ${app} || true
+

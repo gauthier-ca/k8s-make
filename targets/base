@@ -1,0 +1,48 @@
+stage = dev
+overlays = k8s/overlays
+
+kubectl = kubectl
+kustomize = ${kubectl} kustomize ${overlays}/${stage}
+
+# Build and run the app
+all: build run
+
+# Build the image
+build:: 
+	@true
+
+# Remove all resources and images
+clean::
+	@true
+
+# Dump the makefile config variables
+config::
+	@echo stage = ${stage}
+
+# Deploy resources to k8s
+deploy::
+	@true
+
+# List the available targets
+help:
+	@make -qp | awk -F':' '/^[a-z0-9][^$$#\/\t=]*:([^=]|$$)/ {split($$1,A,/ /);for(i in A)print A[i]}' | sort | uniq
+
+# Login to the registry
+login::
+	@true
+
+# Push to the registry
+push::
+	@true
+
+# Create the initial ECR repo (needed for AWS ECR)
+repo::
+	@true
+
+# Deploy, then test
+run::
+	@true
+
+# Run tests
+test::
+	@true
