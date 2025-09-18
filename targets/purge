@@ -1,0 +1,3 @@
+purge:: clean
+	@${kustomize} | ${kubectl} delete -f - --ignore-not-found
+

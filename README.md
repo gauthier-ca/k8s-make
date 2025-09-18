@@ -2,8 +2,14 @@
 
 Simple convenience makefiles to build and deploy apps seemlessly to multiple k8s using kustomize manifests. Use only what you need, and override as needed.
 
+## Prerequisites
+To start you need an app repository containing a Dockerfile and a kustomize manifest. You also need a kubernetes cluster, e.g. Docker Desktop, docker, kubectl and GNU make installed.
+
+This tool uses [`yq`](https://github.com/mikefarah/yq). To avoid local dependency issues, it uses the docker version by default. This ensures the tool runs everywhere but is slower. You can set `yq=yq` on the command line or in your environment to use a faster local yq.
+ 
+
 ## Usage
-To start you need an app repository containing a Dockerfile and a kustomize manifest. You also need a kubernetes cluster, e.g. Docker Desktop, and GNU make installed. With that available, clone this repository. Then, in your own app repository, add a Makefile containing:
+In your own app repository, add a Makefile containing:
 
 ```
 include ../k8s-make/targets/base
@@ -27,7 +33,7 @@ The following targets are available:
   <dt>build</dt>
   <dd>Build the image.</dd>
   <dt>clean</dt>
-  <dd>Remove all resources and images.</dd>
+  <dd>Remove all non persistent resources and images.</dd>
   <dt>config</dt>
   <dd>Dump the makefile config variables.</dd>
   <dt>deploy</dt>
@@ -38,6 +44,8 @@ The following targets are available:
   <dd>Login to the registry.</dd>
   <dt>push</dt>
   <dd>Push to the registry.</dd>
+  <dt>purge</dt>
+  <dd>Delete all resources.</dd>
   <dt>repo</dt>
   <dd>Create the initial ECR repo (for AWS ECR).</dd>
   <dt>run</dt>
@@ -48,7 +56,7 @@ The following targets are available:
   <dd>Run tests.</dd>
 </dl>
 
-Persistent resources are defined by adding `metadata.labels.delete: persist` in their manifest. Commands can be combined, e.g.:
+Persistent resources are defined by adding `.metadata.labels.delete: persist` in their manifest. Commands can be combined, e.g.:
 ```
 make clean build run
 ```
@@ -62,9 +70,11 @@ The following variables are available:
   <dd>Set the path to the kustomize overlays directory. Defaults to `k8s/overlays`.</dd>
   <dt>stage</dt>
   <dd>Specify a specific overlay. Defaults to dev.</dd>
+  <dt>yq</dt>
+  <dd>Set the yq binary. Use this for faster runs if you have one installed. Alternatively, set the `yq` variable in your environment.</dd>
 </dl>
 
 `make` Variables can be set on the command line, e.g.:
 ```
-make run stage=prod
+make run stage=prod yq=yq
 ```

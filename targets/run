@@ -1,6 +1,6 @@
-# Get the app name from the Service nanme in the manifest, use grep to avoid a dependency on yq
-app = $(shell ${kustomize} | grep -E 'kind: (Deployment|Job)' -A 10 | grep 'name:' | head -1 | awk '{ print $$2 }')
-namespace = $(shell ${kustomize} | grep -E 'kind: (Deployment|Job)' -A 10 | grep 'namespace:' | head -1 | awk '{ print $$2 }')
+# Run yq in docker to avoid a local dependency
+app =  $(shell ${kustomize} | ${yq} '. | select(.kind=="Deployment" or .kind=="Job") | .metadata.name')
+namespace =  $(shell ${kustomize} | ${yq} '. | select(.kind=="Deployment" or .kind=="Job") | .metadata.namespace')
 
 config::
 	@echo app = ${app}

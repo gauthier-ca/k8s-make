@@ -3,6 +3,8 @@ overlays = k8s/overlays
 
 kubectl = kubectl
 kustomize = ${kubectl} kustomize ${overlays}/${stage}
+# Set yq=yq on the command line or in your environment to use a faster local yq
+yq ?= docker run -i --rm -v "${PWD}":/workdir mikefarah/yq
 
 # Build and run the app
 all: build run
@@ -33,6 +35,10 @@ login::
 
 # Push to the registry
 push::
+	@true
+
+# Delete all resources
+purge::
 	@true
 
 # Create the initial ECR repo (needed for AWS ECR)

@@ -1,5 +1,5 @@
-# Get the app name from the manifest, use grep to avoid a dependency on yq
-image = $(shell ${kustomize} | grep -E 'kind: (Deployment|Job)' -A 50 | grep 'containers:' -A 50 | grep 'image:'| head -1 | awk '{ print $$2 }')
+# Run yq in docker to avoid a local dependency
+image = $(shell ${kustomize} | ${yq} '. | select(.kind=="Deployment" or .kind=="Job") | .spec.template.spec.containers[0].image')
 
 build::
 	@#docker build -t ${image} . --progress=plain --no-cache
