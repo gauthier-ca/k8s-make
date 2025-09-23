@@ -32,6 +32,8 @@ The following targets are available:
   <dd>Build and run the app.</dd>
   <dt>build</dt>
   <dd>Build the image.</dd>
+  <dt>check</dt>
+  <dd>Print the results of previous targets.</dd>
   <dt>clean</dt>
   <dd>Remove all non persistent resources and images.</dd>
   <dt>config</dt>

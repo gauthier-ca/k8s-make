@@ -1,10 +1,14 @@
-stage = dev
-overlays = k8s/overlays
+stage := dev
+overlays := k8s/overlays
 
-kubectl = kubectl
-kustomize = ${kubectl} kustomize ${overlays}/${stage}
+kubectl := kubectl
+kustomize := ${kubectl} kustomize ${overlays}/${stage}
 # Set yq=yq on the command line or in your environment to use a faster local yq
 yq ?= docker run -i --rm -v "${PWD}":/workdir mikefarah/yq
+
+# Run yq in docker to avoid a local dependency
+app :=  $(shell ${kustomize} | ${yq} '. | select(.kind=="Deployment" or .kind=="Job") | .metadata.name')
+namespace :=  $(shell ${kustomize} | ${yq} '. | select(.kind=="Deployment" or .kind=="Job") | .metadata.namespace')
 
 # Build and run the app
 all: build run
@@ -15,6 +19,10 @@ build::
 
 # Remove all resources and images
 clean::
+	@true
+
+# Print the results of previous targets
+check::
 	@true
 
 # Dump the makefile config variables
@@ -52,3 +60,4 @@ run::
 # Run tests
 test::
 	@true
+

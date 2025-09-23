@@ -1,6 +1,12 @@
-# Run yq in docker to avoid a local dependency
-app =  $(shell ${kustomize} | ${yq} '. | select(.kind=="Deployment" or .kind=="Job") | .metadata.name')
-namespace =  $(shell ${kustomize} | ${yq} '. | select(.kind=="Deployment" or .kind=="Job") | .metadata.namespace')
+app :=  $(shell ${kustomize} | ${yq} '. | select(.kind=="Deployment" or .kind=="Job") | .metadata.name')
+namespace :=  $(shell ${kustomize} | ${yq} '. | select(.kind=="Deployment" or .kind=="Job") | .metadata.namespace')
+
+ifeq ($(namespace), )
+$(error error: the deployment or job must include .metadata.amespace)
+endif
+
+check::
+	kubectl get pods -n ${namespace}
 
 config::
 	@echo app = ${app}
@@ -8,7 +14,5 @@ config::
 
 deploy::
 	@${kustomize} | ${kubectl} apply -f -
-	@#${kubectl} rollout status deployment.apps/${app} -n ${namespace}
-	kubectl wait --for=condition=Ready pod -l app=${app} -n ${namespace}
 
 run:: deploy test
