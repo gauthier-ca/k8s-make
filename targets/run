@@ -2,7 +2,7 @@ app :=  $(shell ${kustomize} | ${yq} '. | select(.kind=="Deployment" or .kind=="
 namespace :=  $(shell ${kustomize} | ${yq} '. | select(.kind=="Deployment" or .kind=="Job") | .metadata.namespace')
 
 ifeq ($(namespace), )
-$(error error: the deployment or job must include .metadata.amespace)
+$(error error: the deployment or job must include .metadata.namespace)
 endif
 
 check::
