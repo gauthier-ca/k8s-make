@@ -80,3 +80,7 @@ The following variables are available:
 ```
 make run stage=prod yq=yq
 ```
+
+## Known issues
+
+The targets currently assume a single image is to be built. This image name is looked up the the first Deployment, Job or CronJob object of the manifest.
