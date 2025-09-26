@@ -1,12 +1,13 @@
 # Run yq in docker to avoid a local dependency
-image = $(shell ${kustomize} | ${yq} '. | select(.kind=="Deployment" or .kind=="Job") | .spec.template.spec.containers[0].image')
+image = $(shell ${kustomize} | ${yq} '. | select(.kind=="Deployment" or .kind=="Job" or .kind=="CronJob")' \
+	| ${yq} 'select(document_index == 0) | .. | select(path | join(".") | test("\\.image$$"))' )
 
 build::
 	@#docker build -t ${image} . --progress=plain --no-cache
 	docker build -t ${image} .
 
 clean:: stop
-	@docker rmi -f "${image}" &> /dev/null
+	docker rmi -f "${image}" &> /dev/null
 
 config::
 	@echo image = ${image}

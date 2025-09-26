@@ -1,18 +1,10 @@
-app :=  $(shell ${kustomize} | ${yq} '. | select(.kind=="Deployment" or .kind=="Job") | .metadata.name')
-namespace :=  $(shell ${kustomize} | ${yq} '. | select(.kind=="Deployment" or .kind=="Job") | .metadata.namespace')
-
-ifeq ($(namespace), )
-$(error error: the deployment or job must include .metadata.namespace)
-endif
-
 check::
 	kubectl get pods -n ${namespace}
-
-config::
-	@echo app = ${app}
-	@echo namespace = ${namespace}
 
 deploy::
 	@${kustomize} | ${kubectl} apply -f -
 
 run:: deploy test
+
+stop::
+	${kustomize} | ${kubectl} delete --selector delete!=persist -f - --ignore-not-found

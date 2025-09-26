@@ -7,8 +7,13 @@ kustomize := ${kubectl} kustomize ${overlays}/${stage}
 yq ?= docker run -i --rm -v "${PWD}":/workdir mikefarah/yq
 
 # Run yq in docker to avoid a local dependency
-app :=  $(shell ${kustomize} | ${yq} '. | select(.kind=="Deployment" or .kind=="Job") | .metadata.name')
-namespace :=  $(shell ${kustomize} | ${yq} '. | select(.kind=="Deployment" or .kind=="Job") | .metadata.namespace')
+app :=  $(shell ${kustomize} | ${yq} '. | select(.kind=="Deployment" or .kind=="Job" or .kind=="CronJob")' \
+	| ${yq} 'select(document_index == 0) | .metadata.name' )
+namespace = $(shell ${kustomize} | ${yq} '. | select(.kind=="Deployment" or .kind=="Job" or .kind=="CronJob")' \
+	| ${yq} 'select(document_index == 0) | .metadata.namespace' )
+ifeq ($(namespace), )
+$(error error: the deployment or job must include .metadata.namespace)
+endif
 
 # Build and run the app
 all: build run
@@ -28,6 +33,8 @@ check::
 # Dump the makefile config variables
 config::
 	@echo stage = ${stage}
+	@echo app = ${app}
+	@echo namespace = ${namespace}
 
 # Deploy resources to k8s
 deploy::
